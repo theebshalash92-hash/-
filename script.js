@@ -1,55 +1,63 @@
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxKZxbfSiCNQkVUlzwoQsxiu0Qdse2pTVHdcZBpY-Cnps1sLriV7lf3LFBA8Y0N5goCNQ/exec"; 
+// 1. ضع هنا رابط الـ Web App الخاص بك الذي حصلت عليه من Google Apps Script (Deploy)
+const scriptUrl = "https://script.google.com/macros/s/XXXXX-YOUR-ID-XXXXX/exec";
 
+// 2. دالة لجلب البيانات وعرضها في السوبر ماركت
 async function fetchProducts() {
-    const grid = document.getElementById('productGrid');
-    grid.innerHTML = "<p style='text-align:center;'>جاري فحص البيانات...</p>";
+    const productContainer = document.getElementById('product-container');
+    
+    // إظهار رسالة تحميل بسيطة
+    productContainer.innerHTML = "<p style='text-align:center;'>جاري تحميل المنتجات من سوبر ماركت جي جي...</p>";
 
     try {
-        const response = await fetch(SHEET_API_URL);
-        const data = await response.json();
+        const response = await fetch(scriptUrl);
+        const products = await response.json();
 
-        // فحص: هل البيانات مصفوفة (Array)؟
-        if (Array.isArray(data)) {
-            renderProducts(data);
-        } else {
-            // إذا لم تكن مصفوفة، نعرض ما وصلنا فعلياً لنفهم المشكلة
-            console.error("البيانات المستلمة ليست مصفوفة:", data);
-            grid.innerHTML = `<p style="color:red; text-align:center;">
-                خطأ: استلمنا بيانات غير صحيحة.<br>
-                الرسالة: ${data.error || "غير معروفة"}
-            </p>`;
+        // تنظيف الحاوية قبل البدء
+        productContainer.innerHTML = "";
+
+        if (products.error) {
+            productContainer.innerHTML = `<p style='color:red;'>خطأ: ${products.error}</p>`;
+            return;
         }
 
+        // 3. بناء الكروت لكل منتج
+        products.forEach(item => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+
+            // التعديل المطلوب لروابط الصور من جوجل درايف
+            // إذا لم توجد صورة، سيتم وضع صورة افتراضية (placeholder)
+            const imageUrl = item.image || "https://via.placeholder.com/150?text=No+Image";
+
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${item.titleAr}" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                </div>
+                <div class="product-info">
+                    <span class="category">${item.category}</span>
+                    <h3 class="title">${item.titleAr}</h3>
+                    <p class="barcode">Barcode: ${item.barcode}</p>
+                    <div class="price-container">
+                        <span class="price">${item.price} JOD</span>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart('${item.barcode}')">إضافة للسلة</button>
+                </div>
+            `;
+            
+            productContainer.appendChild(productCard);
+        });
+
     } catch (error) {
-        console.error("خطأ في التحميل:", error);
-        grid.innerHTML = `<p style="color:red; text-align:center;">تعذر الاتصال بقاعدة البيانات. تأكد من نشر الرابط بصلاحية Anyone.</p>`;
+        console.error("خطأ في جلب البيانات:", error);
+        productContainer.innerHTML = "<p style='color:red; text-align:center;'>عذراً، فشل الاتصال بقاعدة البيانات.</p>";
     }
 }
 
-function renderProducts(products) {
-    const grid = document.getElementById('productGrid');
-    grid.innerHTML = ""; 
-
-    products.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        
-        // استخدمنا صورة بديلة من مصدر مختلف لتجنب خطأ ERR_NAME_NOT_RESOLVED
-        const imageUrl = `images/${item.barcode}.jpg`; 
-        const placeholder = "https://placehold.co/150x150?text=No+Image";
-
-        card.innerHTML = `
-            <div class="product-image">
-                <img src="${imageUrl}" alt="${item.titleAr}" onerror="this.src='${placeholder}'">
-            </div>
-            <div class="product-info">
-                <h3>${item.titleAr || 'بدون اسم'}</h3>
-                <p class="price">${item.price || '0.00'} JD</p>
-                <button class="add-btn">أضف للسلة <i class="fas fa-plus"></i></button>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
+// 4. دالة بسيطة للإضافة للسلة (يمكنك تطويرها لاحقاً)
+function addToCart(barcode) {
+    console.log("تمت إضافة المنتج ذو الباركود: " + barcode);
+    alert("تمت إضافة المنتج إلى سلة المشتريات!");
 }
 
-fetchProducts();
+// 5. تشغيل الدالة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', fetchProducts);
