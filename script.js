@@ -1,5 +1,5 @@
 // 1. ضع هنا رابط الـ Web App الخاص بك الذي حصلت عليه من Google Apps Script (Deploy)
-const scriptUrl = "https://script.google.com/macros/s/XXXXX-YOUR-ID-XXXXX/exec";
+const scriptUrl = "https://script.google.com/macros/s/AKfycbxKZxbfSiCNQkVUlzwoQsxiu0Qdse2pTVHdcZBpY-Cnps1sLriV7lf3LFBA8Y0N5goCNQ/exec";
 
 // 2. دالة لجلب البيانات وعرضها في السوبر ماركت
 async function fetchProducts() {
