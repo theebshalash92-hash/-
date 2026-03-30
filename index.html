@@ -1,1 +1,50 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JJ's Supermarket | جي جي سوبر ماركت</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">JJ's Supermarket</div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="ابحث عن مادة أو امسح باركود...">
+            <i class="fas fa-barcode"></i>
+        </div>
+    </header>
 
+    <nav class="categories" id="categoryNav">
+        <button class="active">الكل</button>
+        <button>مخبوزات</button>
+        <button>مشروبات</button>
+        <button>منظفات</button>
+    </nav>
+
+    <main class="product-grid" id="productGrid">
+        <div class="product-card">
+            <div class="product-image">
+                <img src="https://via.placeholder.com/150" alt="منتج">
+            </div>
+            <div class="product-info">
+                <h3>اسم المادة بالعربي</h3>
+                <p class="price">1.50 JD</p>
+                <button class="add-btn">أضف للسلة <i class="fas fa-plus"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <div class="cart-summary">
+        <div class="cart-info">
+            <i class="fas fa-shopping-basket"></i>
+            <span>3 مواد في السلة</span>
+        </div>
+        <div class="total-price">4.50 JD</div>
+        <button class="checkout-btn">اتمام الطلب</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
