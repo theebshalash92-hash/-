@@ -1,5 +1,5 @@
 // 1. ضع هنا الرابط الذي حصلت عليه من "Google Apps Script" (Web App URL)
-const SHEET_API_URL = "رابط_تطبيق_جوجل_هنا"; 
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxKZxbfSiCNQkVUlzwoQsxiu0Qdse2pTVHdcZBpY-Cnps1sLriV7lf3LFBA8Y0N5goCNQ/exec"; 
 
 // 2. قاعدة بيانات الصور (استبدل الرابط برابط مجلد الصور العام الخاص بك)
 const IMAGE_FOLDER_URL = "https://your-drive-link.com/products/";
