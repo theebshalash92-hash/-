@@ -1,5 +1,5 @@
 // 1. ضع رابط الـ Web App الخاص بك هنا
-const API_URL = "https://script.google.com/macros/s/AKfycbz_XXXXXXXXX/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxKZxbfSiCNQkVUlzwoQsxiu0Qdse2pTVHdcZBpY-Cnps1sLriV7lf3LFBA8Y0N5goCNQ/exec";
 
 let allProducts = []; // مخزن مؤقت للمنتجات للبحث السريع
 
