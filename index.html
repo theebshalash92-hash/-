@@ -4,15 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JJ's Supermarket</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h2>JJ's Supermarket</h2>
-        <input type="text" id="search" placeholder="بحث..." onkeyup="filterProducts()">
+
+    <div id="intro-layer">
+        <video id="intro-video" autoplay muted>
+            <source src="intro.mp4.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="logo.png.png" alt="JJ's Logo" class="center-logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="ابحث عن منتج..." onkeyup="filterProducts()">
+        </div>
     </header>
-    <div id="product-container"></div>
+
+    <main id="product-container"></main>
+
+    <div id="cart-drawer" onclick="toggleCart()">
+        <span id="cart-count">0</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" width="30">
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
