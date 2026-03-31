@@ -1,52 +1,35 @@
-// إضافة رقم عشوائي (Timestamp) لنهاية الرابط لإجبار المتصفح على جلب أحدث البيانات
+// استخدام Timestamp فقط لتجاوز الكاش بدون تعقيد البرمجة
 const API_URL = "https://script.google.com/macros/s/AKfycbyA4zh-03bBRGayv5aOX4TkQl2uWlYYRt8Kmz27-B4t-29U2HIFhOHPrntBtNpMREqMrQ/exec?v=" + new Date().getTime(); 
 
 let allProducts = [];
 
-// عند تحميل الصفحة بالكامل
 window.addEventListener('DOMContentLoaded', () => {
-    // 1. تنظيف الذاكرة القديمة لضمان عدم حدوث تعارض
-    localStorage.removeItem('jj_supermarket_cache');
-    
-    // 2. إظهار رسالة انتظار للزبون
+    // إظهار رسالة بسيطة للزبون
     const container = document.getElementById('product-container');
-    if (container) {
-        container.innerHTML = '<div class="loading">🔄 جاري تحديث الرفوف...</div>';
-    }
+    container.innerHTML = '<div class="loading">🔄 جاري جلب المنتجات...</div>';
     
-    // 3. بدء جلب البيانات
     fetchData(); 
 });
 
 async function fetchData() {
     try {
-        // استخدام "no-cache" لإجبار الموبايل على عدم استخدام النسخة القديمة
-        const response = await fetch(API_URL, {
-            method: 'GET',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
+        // نداء بسيط جداً للرابط (هذا الشكل هو الأكثر استقراراً للموبايل)
+        const response = await fetch(API_URL);
         const data = await response.json();
         
-        // التحقق من وصول البيانات
         if (data && data.length > 0) {
             allProducts = data;
             renderUI(data);
         } else {
-            document.getElementById('product-container').innerHTML = 
-                "<div class='loading'>📭 لا توجد مواد معروضة حالياً</div>";
+            document.getElementById('product-container').innerHTML = "📭 لا توجد مواد حالياً";
         }
     } catch (error) {
-        console.error("خطأ في الاتصال:", error);
-        document.getElementById('product-container').innerHTML = 
-            "<div class='loading'>⚠️ عذراً، تأكد من اتصال الإنترنت وحاول مجدداً</div>";
+        console.error("Error:", error);
+        // في حال فشل الاتصال، سنحاول إظهار البيانات المخزنة سابقاً إن وجدت
+        document.getElementById('product-container').innerHTML = "⚠️ عذراً، يرجى تحديث الصفحة (Refresh)";
     }
 }
 
-// دالة عرض المنتجات في الصفحة
 function renderUI(products) {
     const container = document.getElementById('product-container');
     if (!container) return;
@@ -55,7 +38,6 @@ function renderUI(products) {
         <div class="product-card">
             <div class="img-box">
                 <img src="${item.image || 'https://via.placeholder.com/150?text=JJ'}" 
-                     alt="${item.titleAr}" 
                      onerror="this.src='https://via.placeholder.com/150?text=JJ'"
                      loading="lazy">
             </div>
@@ -70,14 +52,8 @@ function renderUI(products) {
     `).join('');
 }
 
-// دالة البحث (تصفية المنتجات)
 function filterProducts() {
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    if (!searchTerm) {
-        renderUI(allProducts);
-        return;
-    }
-    
     const filtered = allProducts.filter(p => 
         (p.titleAr && p.titleAr.toLowerCase().includes(searchTerm)) || 
         (p.barcode && p.barcode.toString().includes(searchTerm))
@@ -85,17 +61,8 @@ function filterProducts() {
     renderUI(filtered);
 }
 
-// دالة تحديث سلة المشتريات
 function addToCart() {
     const countElement = document.getElementById('cart-count');
-    if (countElement) {
-        let currentCount = parseInt(countElement.innerText);
-        countElement.innerText = currentCount + 1;
-        
-        // تأثير بصري للزر عند الضغط
-        countElement.style.transform = "scale(1.3)";
-        setTimeout(() => {
-            countElement.style.transform = "scale(1)";
-        }, 200);
-    }
+    let currentCount = parseInt(countElement.innerText);
+    countElement.innerText = currentCount + 1;
 }
