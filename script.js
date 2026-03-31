@@ -1,41 +1,87 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKZxbfSiCNQkVUlzwoQsxiu0Qdse2pTVHdcZBpY-Cnps1sLriV7lf3LFBA8Y0N5goCNQ/exec";
+// 1. ضع رابط الـ Web App الخاص بك هنا
+const API_URL = "https://script.google.com/macros/s/AKfycbz_XXXXXXXXX/exec";
 
-async function loadProducts() {
+let allProducts = []; // مخزن مؤقت للمنتجات للبحث السريع
+
+/**
+ * دالة جلب البيانات من Google Apps Script
+ */
+async function fetchProducts() {
     const container = document.getElementById('product-container');
-    if (!container) return;
-
-    container.innerHTML = "<p>جاري تحميل بضائع JJ's Supermarket...</p>";
-
+    
     try {
-        const response = await fetch(SCRIPT_URL);
+        const response = await fetch(API_URL);
         const data = await response.json();
-        container.innerHTML = ""; 
 
-        data.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            
-            // الصور بناءً على الباركود فقط من جوجل درايف
-            const imgUrl = item.image || "https://via.placeholder.com/150";
+        if (data.error) {
+            container.innerHTML = `<div class="loading-status" style="color:red;">خطأ: ${data.error}</div>`;
+            return;
+        }
 
-            card.innerHTML = `
-                <div class="image-box">
-                    <img src="${imgUrl}" alt="${item.titleAr}" onerror="this.src='https://via.placeholder.com/150'">
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">${item.titleAr}</h3>
-                    <p class="barcode-text">باركود: ${item.barcode}</p>
-                    <div class="price-row">
-                        <span class="price-tag">${parseFloat(item.price).toFixed(2)} JD</span>
-                        <button class="add-button" onclick="addToCart('${item.barcode}')">أضف للسلة +</button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    } catch (e) {
-        container.innerHTML = "<p>تعذر الاتصال بقاعدة البيانات.</p>";
+        allProducts = data;
+        displayProducts(allProducts);
+
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        container.innerHTML = `<div class="loading-status" style="color:red;">فشل الاتصال بالخادم. يرجى التأكد من نشر السكريبت (Deploy).</div>`;
     }
 }
 
-document.addEventListener('DOMContentLoaded', loadProducts);
+/**
+ * دالة عرض المنتجات في الـ HTML
+ */
+function displayProducts(products) {
+    const container = document.getElementById('product-container');
+    container.innerHTML = ""; // تنظيف الحاوية
+
+    if (products.length === 0) {
+        container.innerHTML = `<div class="loading-status">لا توجد منتجات مطابقة.</div>`;
+        return;
+    }
+
+    products.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+
+        // رابط الصورة المباشر من Google Drive (المولّد في Apps Script)
+        // إذا لم تكن هناك صورة، استخدم صورة placeholder
+        const imgUrl = item.image || "https://via.placeholder.com/200x200?text=No+Image";
+
+        card.innerHTML = `
+            <div class="image-wrapper">
+                <img src="${imgUrl}" alt="${item.titleAr}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Error'">
+            </div>
+            <div class="product-info">
+                <span class="category-label">${item.category || 'سوبر ماركت'}</span>
+                <h3 class="product-title">${item.titleAr}</h3>
+                <div class="price-row">
+                    <span class="price-value">${parseFloat(item.price).toFixed(2)} JD</span>
+                    <button class="add-btn" onclick="addToCart('${item.barcode}', '${item.titleAr}')">إضافة</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+/**
+ * دالة البحث السريع
+ */
+function filterProducts() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allProducts.filter(p => 
+        p.titleAr.toLowerCase().includes(term) || 
+        p.barcode.toString().includes(term)
+    );
+    displayProducts(filtered);
+}
+
+/**
+ * دالة زر الإضافة (تنبيه)
+ */
+function addToCart(barcode, name) {
+    alert(`تمت إضافة [${name}] إلى السلة بنجاح!`);
+}
+
+// البدء عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', fetchProducts);
