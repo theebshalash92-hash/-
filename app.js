@@ -1,46 +1,53 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyA4zh-03bBRGayv5aOX4TkQl2uWlYYRt8Kmz27-B4t-29U2HIFhOHPrntBtNpMREqMrQ/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbyA4zh-03bBRGayv5aOX4TkQl2uWlYYRt8Kmz27-B4t-29U2HIFhOHPrntBtNpMREqMrQ/exec?nocache=" + new Date().getTime(); 
 
 let allProducts = [];
 
 window.onload = () => {
+    console.log("بداية جلب البيانات...");
     fetchData(); 
 };
 
 async function fetchData() {
     const container = document.getElementById('product-container');
     try {
-        // نستخدم fetch مباشر وبسيط بدون تعقيدات
         const response = await fetch(API_URL);
         const data = await response.json();
         
+        console.log("البيانات وصلت:", data);
+
         if (data && data.length > 0) {
             allProducts = data;
             renderUI(data);
         } else {
-            container.innerHTML = "📭 لا توجد مواد حالياً";
+            container.innerHTML = "<div class='loading'>📭 لا توجد مواد معروضة حالياً</div>";
         }
     } catch (error) {
-        console.error(error);
-        container.innerHTML = "⚠️ يرجى سحب الشاشة للأسفل للتحديث";
+        console.error("خطأ في الجلب:", error);
+        container.innerHTML = "<div class='loading'>⚠️ يرجى سحب الشاشة للأسفل للتحديث</div>";
+        // إعادة المحاولة بعد ثانيتين تلقائياً
+        setTimeout(fetchData, 2000);
     }
 }
 
 function renderUI(products) {
     const container = document.getElementById('product-container');
-    container.innerHTML = products.map(item => `
-        <div class="product-card">
-            <div class="img-box">
-                <img src="${item.image || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
-            </div>
-            <div class="info">
-                <h3>${item.titleAr || 'منتج'}</h3>
-                <div class="price-row">
-                    <span class="price">${item.price || '0.00'} JD</span>
-                    <button class="add-btn" onclick="addToCart()">+</button>
+    container.innerHTML = products.map(item => {
+        let img = item.image || 'https://via.placeholder.com/150?text=JJ';
+        return `
+            <div class="product-card">
+                <div class="img-box">
+                    <img src="${img}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=JJ'">
+                </div>
+                <div class="info">
+                    <h3>${item.titleAr || 'منتج'}</h3>
+                    <div class="price-row">
+                        <span class="price">${item.price || '0.00'} JD</span>
+                        <button class="add-btn" onclick="addToCart()">+</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function filterProducts() {
