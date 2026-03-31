@@ -1,87 +1,64 @@
-// 1. ضع رابط الـ Web App الخاص بك هنا
 const API_URL = "https://script.google.com/macros/s/AKfycbxKZxbfSiCNQkVUlzwoQsxiu0Qdse2pTVHdcZBpY-Cnps1sLriV7lf3LFBA8Y0N5goCNQ/exec";
+let allProducts = [];
 
-let allProducts = []; // مخزن مؤقت للمنتجات للبحث السريع
-
-/**
- * دالة جلب البيانات من Google Apps Script
- */
-async function fetchProducts() {
+// دالة التشغيل الفوري
+async function init() {
     const container = document.getElementById('product-container');
     
+    // 1. جلب البيانات من ذاكرة الجهاز (السرعة الفورية)
+    const cached = localStorage.getItem('jj_store_data');
+    if (cached) {
+        allProducts = JSON.parse(cached);
+        renderUI(allProducts);
+    }
+
+    // 2. تحديث البيانات من السيرفر في الخلفية
     try {
         const response = await fetch(API_URL);
-        const data = await response.json();
-
-        if (data.error) {
-            container.innerHTML = `<div class="loading-status" style="color:red;">خطأ: ${data.error}</div>`;
-            return;
+        const freshData = await response.json();
+        
+        if (freshData.length > 0) {
+            allProducts = freshData;
+            localStorage.setItem('jj_store_data', JSON.stringify(freshData));
+            renderUI(allProducts); // تحديث الشاشة بالأسعار الجديدة إن وجدت
         }
-
-        allProducts = data;
-        displayProducts(allProducts);
-
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        container.innerHTML = `<div class="loading-status" style="color:red;">فشل الاتصال بالخادم. يرجى التأكد من نشر السكريبت (Deploy).</div>`;
+    } catch (e) {
+        console.log("Offline mode or Server error");
     }
 }
 
-/**
- * دالة عرض المنتجات في الـ HTML
- */
-function displayProducts(products) {
+function renderUI(products) {
     const container = document.getElementById('product-container');
-    container.innerHTML = ""; // تنظيف الحاوية
-
-    if (products.length === 0) {
-        container.innerHTML = `<div class="loading-status">لا توجد منتجات مطابقة.</div>`;
-        return;
-    }
-
-    products.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-
-        // رابط الصورة المباشر من Google Drive (المولّد في Apps Script)
-        // إذا لم تكن هناك صورة، استخدم صورة placeholder
-        const imgUrl = item.image || "https://via.placeholder.com/200x200?text=No+Image";
-
-        card.innerHTML = `
-            <div class="image-wrapper">
-                <img src="${imgUrl}" alt="${item.titleAr}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Error'">
+    container.innerHTML = products.map(item => `
+        <div class="product-card">
+            <div class="img-container">
+                <img src="${item.image || 'https://via.placeholder.com/200'}" 
+                     loading="lazy" 
+                     alt="${item.titleAr}"
+                     onerror="this.src='https://via.placeholder.com/200'">
             </div>
-            <div class="product-info">
-                <span class="category-label">${item.category || 'سوبر ماركت'}</span>
-                <h3 class="product-title">${item.titleAr}</h3>
-                <div class="price-row">
-                    <span class="price-value">${parseFloat(item.price).toFixed(2)} JD</span>
-                    <button class="add-btn" onclick="addToCart('${item.barcode}', '${item.titleAr}')">إضافة</button>
+            <div class="info">
+                <span class="cat">${item.category}</span>
+                <h3>${item.titleAr}</h3>
+                <div class="bottom">
+                    <span class="price">${item.price} JD</span>
+                    <button onclick="addToCart('${item.barcode}')">+</button>
                 </div>
             </div>
-        `;
-        container.appendChild(card);
-    });
+        </div>
+    `).join('');
 }
 
-/**
- * دالة البحث السريع
- */
 function filterProducts() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
+    const query = document.getElementById('search').value.toLowerCase();
     const filtered = allProducts.filter(p => 
-        p.titleAr.toLowerCase().includes(term) || 
-        p.barcode.toString().includes(term)
+        p.titleAr.includes(query) || p.barcode.includes(query)
     );
-    displayProducts(filtered);
+    renderUI(filtered);
 }
 
-/**
- * دالة زر الإضافة (تنبيه)
- */
-function addToCart(barcode, name) {
-    alert(`تمت إضافة [${name}] إلى السلة بنجاح!`);
+function addToCart(bc) {
+    alert("تمت الإضافة للسلة: " + bc);
 }
 
-// البدء عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', fetchProducts);
+document.addEventListener('DOMContentLoaded', init);
