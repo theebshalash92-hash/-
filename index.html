@@ -3,33 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JJ's Supermarket</title>
+    <title>JJ's Supermarket | جي جي سوبر ماركت</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div id="intro-layer">
-        <video id="intro-video" autoplay muted>
+        <video id="intro-video" autoplay muted playsinline>
             <source src="intro.mp4.mp4" type="video/mp4">
+            متصفحك لا يدعم تشغيل الفيديو.
         </video>
     </div>
 
     <header class="main-header">
-        <div class="logo-container">
-            <img src="logo.png.png" alt="JJ's Logo" class="center-logo">
-        </div>
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="ابحث عن منتج..." onkeyup="filterProducts()">
+        <div class="container">
+            <div class="logo-wrapper">
+                <img src="logo.png.png" alt="JJ's Supermarket Logo" class="main-logo">
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="بحث عن منتج أو باركود..." onkeyup="filterProducts()">
+            </div>
         </div>
     </header>
 
-    <main id="product-container"></main>
+    <main class="container">
+        <div id="product-container" class="products-grid">
+            <div class="loading-msg">جاري تحميل المنتجات...</div>
+        </div>
+    </main>
 
-    <div id="cart-drawer" onclick="toggleCart()">
-        <span id="cart-count">0</span>
-        <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" width="30">
+    <div id="floating-cart" onclick="openCartView()">
+        <div class="cart-icon-wrapper">
+            <span id="cart-count">0</span>
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>سلة المشتريات</h3>
+                <span class="close-btn" onclick="closeCartView()">&times;</span>
+            </div>
+            <div id="cart-items-list">
+                </div>
+            <div class="modal-footer">
+                <button class="checkout-btn" onclick="sendToWhatsapp()">إرسال الطلب عبر واتساب</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
+
 </body>
 </html>
