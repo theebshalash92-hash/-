@@ -159,6 +159,6 @@ function sendToWhatsapp() {
     message += `%0A*المجموع الكلي: ${total.toFixed(2)} JD*`;
     
     // استبدل الرقم برقم واتساب المحل الخاص بك (بدون أصفار أو +)
-    const phoneNumber = "962XXXXXXXXX"; 
+    const phoneNumber = "962788984458"; 
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
 }
