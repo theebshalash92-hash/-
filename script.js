@@ -1,28 +1,29 @@
-// الرابط الجديد الذي أرسلته والذي يعمل بنجاح
 const API_URL = "https://script.google.com/macros/s/AKfycbyA4zh-03bBRGayv5aOX4TkQl2uWlYYRt8Kmz27-B4t-29U2HIFhOHPrntBtNpMREqMrQ/exec"; 
 
 let allProducts = [];
 
-document.addEventListener('DOMContentLoaded', () => {
-    // إظهار رسالة تحميل بسيطة
-    document.getElementById('product-container').innerHTML = '<div class="loading">جاري جلب المنتجات...</div>';
+window.addEventListener('DOMContentLoaded', () => {
+    console.log("الموقع جاهز، جاري طلب البيانات...");
     loadData();
 });
 
 async function loadData() {
+    const container = document.getElementById('product-container');
     try {
         const res = await fetch(API_URL);
         const data = await res.json();
         
+        console.log("البيانات المستلمة:", data);
+
         if (data && data.length > 0) {
             allProducts = data;
             renderUI(data);
         } else {
-            document.getElementById('product-container').innerHTML = "لا توجد مواد حالياً في القائمة";
+            container.innerHTML = "<div class='loading'>قائمة المنتجات فارغة حالياً</div>";
         }
     } catch (e) {
-        console.error("Fetch Error:", e);
-        document.getElementById('product-container').innerHTML = "خطأ في الاتصال بالسيرفر، يرجى المحاولة لاحقاً";
+        console.error("خطأ:", e);
+        container.innerHTML = "<div class='loading'>حدث خطأ أثناء جلب البيانات، يرجى تحديث الصفحة</div>";
     }
 }
 
@@ -31,13 +32,13 @@ function renderUI(products) {
     container.innerHTML = products.map(item => `
         <div class="product-card">
             <div class="img-box">
-                <img src="${item.image || 'https://via.placeholder.com/150?text=JJ'}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=JJ'">
+                <img src="${item.image || 'https://via.placeholder.com/150?text=JJ'}" loading="lazy">
             </div>
             <div class="info">
-                <h3>${item.titleAr}</h3>
+                <h3>${item.titleAr || 'منتج'}</h3>
                 <div class="price-row">
-                    <span class="price">${item.price} JD</span>
-                    <button class="add-btn" onclick="addOne()">إضافة +</button>
+                    <span class="price">${item.price || '0.00'} JD</span>
+                    <button class="add-btn" onclick="addOne()">+</button>
                 </div>
             </div>
         </div>
