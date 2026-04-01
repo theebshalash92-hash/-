@@ -16,11 +16,11 @@ async function fetchData() {
             allProducts = data;
             renderUI(data);
         } else {
-            container.innerHTML = "📭 لا توجد مواد حالياً";
+            container.innerHTML = "<div class='loading'>📭 لا توجد مواد معروضة حالياً</div>";
         }
     } catch (error) {
-        console.error("Fetch error:", error);
-        container.innerHTML = "⚠️ حدث خطأ في جلب المواد، حاول التحديث";
+        console.error("Error:", error);
+        container.innerHTML = "<div class='loading'>⚠️ عذراً، يرجى تحديث الصفحة</div>";
     }
 }
 
@@ -29,7 +29,8 @@ function renderUI(products) {
     container.innerHTML = products.map(item => `
         <div class="product-card">
             <div class="img-box">
-                <img src="${item.image || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
+                <img src="${item.image || 'https://via.placeholder.com/150'}" 
+                     onerror="this.src='https://via.placeholder.com/150'">
             </div>
             <div class="info">
                 <h3>${item.titleAr || 'منتج'}</h3>
