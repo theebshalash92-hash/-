@@ -4,25 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JJ's Supermarket</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="main-header">
         <img src="logo.png.png" alt="JJ Logo" class="center-logo">
-        <div class="search-wrapper">
-            <input type="text" id="search-input" placeholder="بحث عن منتج..." onkeyup="filterProducts()">
-        </div>
+        <input type="text" id="search-input" placeholder="بحث عن منتج..." onkeyup="filterProducts()">
     </header>
 
     <main class="container">
         <div id="product-container" class="products-grid">
-            <div class="loading">🔄 جاري الاتصال بالمحل...</div>
+            <div class="loading">🔄 جاري التحميل...</div>
         </div>
     </main>
 
     <div id="floating-cart"><span id="cart-count">0</span>🛒</div>
 
-    <script src="app_v2.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
