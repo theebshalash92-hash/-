@@ -2,15 +2,13 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyA4zh-03bBRGayv5aOX4Tk
 
 let allProducts = [];
 
-// هذه الدالة تعمل فور فتح الصفحة
-window.onload = function() {
-    fetchData();
+window.onload = () => {
+    fetchData(); 
 };
 
 async function fetchData() {
     const container = document.getElementById('product-container');
     try {
-        // نستخدم fetch مباشر وبسيط جداً
         const response = await fetch(API_URL);
         const data = await response.json();
         
@@ -21,8 +19,8 @@ async function fetchData() {
             container.innerHTML = "📭 لا توجد مواد حالياً";
         }
     } catch (error) {
-        console.error("Error:", error);
-        container.innerHTML = "⚠️ حدث خطأ، يرجى تحديث الصفحة";
+        console.error("Fetch error:", error);
+        container.innerHTML = "⚠️ حدث خطأ في جلب المواد، حاول التحديث";
     }
 }
 
