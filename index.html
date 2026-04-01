@@ -9,7 +9,7 @@
 </head>
 <body>
     <header class="main-header">
-        <img src="logo.png.png" alt="JJ Logo" class="center-logo">
+        <img src="logo.png.png" alt="JJ Logo" class="center-logo" id="logo-header">
         <div class="search-wrapper">
             <input type="text" id="search-input" placeholder="بحث عن منتج..." onkeyup="filterProducts()">
         </div>
@@ -17,11 +17,14 @@
 
     <main class="container">
         <div id="product-container" class="products-grid">
-            <div class="loading">🔄 جاري ااضافة المواد ...</div>
+            <div class="loading">🔄 جاري التحميل...</div>
         </div>
     </main>
 
-    <div id="floating-cart"><span id="cart-count">0</span>🛒</div>
+    <div id="floating-cart">
+        <span id="cart-count">0</span>
+        🛒
+    </div>
 
     <script src="script.js"></script>
 </body>
