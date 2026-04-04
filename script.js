@@ -1,11 +1,12 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyA4zh-03bBRGayv5aOX4TkQl2uWlYYRt8Kmz27-B4t-29U2HIFhOHPrntBtNpMREqMrQ/exec"; 
 
 let allProducts = [];
-let cart = {}; // لتخزين الكميات
+let cart = {}; 
 
 window.onload = () => { fetchData(); };
 
 async function fetchData() {
+    const container = document.getElementById('product-container');
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
@@ -14,7 +15,8 @@ async function fetchData() {
             renderUI(data);
         }
     } catch (error) {
-        document.getElementById('product-container').innerHTML = "⚠️ خطأ في الاتصال";
+        console.error(error);
+        container.innerHTML = "⚠️ حدث خطأ في الاتصال، يرجى تحديث الصفحة.";
     }
 }
 
@@ -23,7 +25,7 @@ function renderUI(products) {
     container.innerHTML = products.map(item => {
         const qty = cart[item.barcode] || 0;
         return `
-            <div class="product-card" id="card-${item.barcode}">
+            <div class="product-card">
                 <div class="img-box">
                     <img src="${item.image || 'https://via.placeholder.com/150'}" id="img-${item.barcode}" onerror="this.src='https://via.placeholder.com/150'">
                 </div>
@@ -46,15 +48,11 @@ function renderUI(products) {
 function changeQty(barcode, delta) {
     if (!cart[barcode]) cart[barcode] = 0;
     
-    // إذا ضغطنا زائد، نقوم بعمل تأثير الطيران
-    if (delta > 0) {
-        flyToCart(barcode);
-    }
+    if (delta > 0) { flyToCart(barcode); }
 
     cart[barcode] += delta;
     if (cart[barcode] < 0) cart[barcode] = 0;
 
-    // تحديث الرقم في البطاقة
     document.getElementById(`qty-${barcode}`).innerText = cart[barcode];
     updateCartTotal();
 }
@@ -62,44 +60,31 @@ function changeQty(barcode, delta) {
 function updateCartTotal() {
     const total = Object.values(cart).reduce((a, b) => a + b, 0);
     document.getElementById('cart-count').innerText = total;
-    
-    // حركة بسيطة للسلة عند التحديث
-    const basket = document.getElementById('floating-cart');
-    basket.style.transform = "scale(1.2)";
-    setTimeout(() => basket.style.transform = "scale(1)", 200);
 }
 
 function flyToCart(barcode) {
     const imgElement = document.getElementById(`img-${barcode}`);
     const cartElement = document.getElementById('floating-cart');
-    
     if (!imgElement || !cartElement) return;
 
-    // إنشاء نسخة من الصورة للطيران
-    const flyer = imgElement.cloneNode();
     const rect = imgElement.getBoundingClientRect();
     const cartRect = cartElement.getBoundingClientRect();
+    const flyer = imgElement.cloneNode();
 
     flyer.classList.add('flying-img');
     flyer.style.top = rect.top + 'px';
     flyer.style.left = rect.left + 'px';
-    flyer.style.width = rect.width + 'px';
-
     document.body.appendChild(flyer);
 
-    // بدء الأنيميشن بعد لحظة بسيطة
     setTimeout(() => {
         flyer.style.top = (cartRect.top + 10) + 'px';
         flyer.style.left = (cartRect.left + 10) + 'px';
         flyer.style.width = '20px';
         flyer.style.height = '20px';
-        flyer.style.opacity = '0.5';
-    }, 10);
+        flyer.style.opacity = '0';
+    }, 50);
 
-    // حذف الصورة بعد انتهاء الأنيميشن
-    setTimeout(() => {
-        flyer.remove();
-    }, 800);
+    setTimeout(() => { flyer.remove(); }, 750);
 }
 
 function filterProducts() {
