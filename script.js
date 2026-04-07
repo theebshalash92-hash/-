@@ -26,16 +26,13 @@ async function fetchData() {
     }
 }
 
-// 2. عرض المنتجات
 function renderUI(products) {
     const container = document.getElementById('product-container');
-    if (!container) return;
-    
     container.innerHTML = products.map(item => {
-        let name = item.titleAr || item.الاسم || item.Item || "منتج";
-        let price = item.price || item.السعر || item.Price || "0.00";
+        // الكود الآن يقرأ العناوين بأحرف صغيرة لضمان الدقة
+        let name = item.titlear || item.titleAr || item.الاسم || "منتج";
+        let price = item.price || item.السعر || "0.00";
         let barcode = item.barcode ? item.barcode.toString().trim() : Math.random().toString();
-        // استخدام رابط الصورة من السكريبت أو صورة افتراضية
         let img = item.image || 'https://via.placeholder.com/150?text=JJ';
         
         const qty = cart[barcode] || 0;
@@ -60,7 +57,6 @@ function renderUI(products) {
         `;
     }).join('');
 }
-
 // 3. التحكم بالكميات
 function changeQty(barcode, delta) {
     if (!cart[barcode]) cart[barcode] = 0;
