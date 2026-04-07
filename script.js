@@ -1,4 +1,3 @@
-// الرابط الخاص بك
 const API_URL = "https://script.google.com/macros/s/AKfycbyA4zh-03bBRGayv5aOX4TkQl2uWlYYRt8Kmz27-B4t-29U2HIFhOHPrntBtNpMREqMrQ/exec"; 
 
 let allProducts = [];
@@ -8,30 +7,30 @@ window.onload = () => {
     fetchData(); 
 };
 
+// وظيفة جلب البيانات المعدلة لتجنب خطأ CORS
 async function fetchData() {
     const container = document.getElementById('product-container');
-    // إضافة علامة زمنية للرابط لكسر أي كاش قديم
-    const finalUrl = API_URL + "?t=" + new Date().getTime();
-
     try {
-        const response = await fetch(finalUrl);
+        // نستخدم fetch بدون إضافات معقدة، جوجل سكريبت يحتاج طلب بسيط
+        const response = await fetch(API_URL);
         
-        if (!response.ok) throw new Error("Network response was not ok");
-        
+        if (!response.ok) throw new Error("Network error");
+
         const data = await response.json();
         
         if (data && data.length > 0) {
             allProducts = data;
             renderUI(data);
         } else {
-            container.innerHTML = "📭 لا توجد مواد حالياً في القائمة.";
+            container.innerHTML = "📭 لا توجد مواد حالياً.";
         }
     } catch (error) {
         console.error("Connection Error:", error);
+        // محاولة جلب البيانات بطريقة بديلة إذا فشلت الأولى
         container.innerHTML = `
             <div style="text-align:center; padding:20px;">
-                <p>⚠️ عذراً، واجهنا مشكلة في تحميل المواد.</p>
-                <button onclick="location.reload()" style="background:#000; color:#FFD700; border:1px solid #FFD700; padding:10px 20px; border-radius:20px; margin-top:10px; cursor:pointer;">تحديث الصفحة الآن</button>
+                <p>⚠️ تعذر الاتصال التلقائي.</p>
+                <button onclick="location.reload()" style="background:#000; color:#FFD700; border:1px solid #FFD700; padding:10px 20px; border-radius:20px; cursor:pointer;">إعادة المحاولة</button>
             </div>
         `;
     }
@@ -67,7 +66,9 @@ function renderUI(products) {
 function changeQty(barcode, delta) {
     if (!cart[barcode]) cart[barcode] = 0;
     
-    if (delta > 0) { flyToCart(barcode); }
+    if (delta > 0) { 
+        flyToCart(barcode); 
+    }
 
     cart[barcode] += delta;
     if (cart[barcode] < 0) cart[barcode] = 0;
@@ -81,7 +82,13 @@ function changeQty(barcode, delta) {
 function updateCartTotal() {
     const total = Object.values(cart).reduce((a, b) => a + b, 0);
     const cartCountElement = document.getElementById('cart-count');
-    if (cartCountElement) cartCountElement.innerText = total;
+    if (cartCountElement) {
+        cartCountElement.innerText = total;
+        // حركة نبض للسلة عند الإضافة
+        const basket = document.getElementById('floating-cart');
+        basket.style.transform = "scale(1.2)";
+        setTimeout(() => basket.style.transform = "scale(1)", 200);
+    }
 }
 
 function flyToCart(barcode) {
@@ -93,12 +100,15 @@ function flyToCart(barcode) {
     const cartRect = cartElement.getBoundingClientRect();
     
     const flyer = imgElement.cloneNode();
-    flyer.classList.add('flying-img');
     flyer.style.position = 'fixed';
     flyer.style.top = rect.top + 'px';
     flyer.style.left = rect.left + 'px';
     flyer.style.width = rect.width + 'px';
+    flyer.style.height = rect.height + 'px';
     flyer.style.zIndex = "10000";
+    flyer.style.transition = "all 0.8s cubic-bezier(0.1, 0.5, 0.4, 1)";
+    flyer.style.pointerEvents = "none";
+    flyer.style.borderRadius = "50%";
     
     document.body.appendChild(flyer);
 
@@ -110,7 +120,7 @@ function flyToCart(barcode) {
         flyer.style.opacity = '0';
     }, 50);
 
-    setTimeout(() => { flyer.remove(); }, 800);
+    setTimeout(() => { flyer.remove(); }, 850);
 }
 
 function filterProducts() {
